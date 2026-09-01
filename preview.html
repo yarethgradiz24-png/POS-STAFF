@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba de Staff | Roleplay</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#090d18,#111a2e);
+  color:#fff;min-height:100vh;padding:30px 15px
+}
+.container{max-width:900px;margin:auto}
+.card{
+  background:#121a2b;border:1px solid #263554;border-radius:18px;
+  padding:28px;box-shadow:0 15px 45px rgba(0,0,0,.35);margin-bottom:20px
+}
+h1{text-align:center;margin:0 0 8px;font-size:34px}
+.subtitle{text-align:center;color:#9eabc4;margin-bottom:25px}
+input[type=text]{
+  width:100%;padding:14px;border-radius:10px;border:1px solid #34445f;
+  background:#0b1220;color:#fff;font-size:16px;outline:none
+}
+.question{padding:20px 0;border-bottom:1px solid #263554}
+.question:last-child{border-bottom:0}
+.question h3{margin:0 0 14px;font-size:17px}
+label{
+  display:block;background:#0c1423;border:1px solid #263554;
+  padding:12px;border-radius:9px;margin:8px 0;cursor:pointer
+}
+label:hover{border-color:#4f8cff}
+button{
+  width:100%;padding:15px;border:0;border-radius:10px;
+  background:#3478f6;color:#fff;font-size:17px;font-weight:bold;cursor:pointer
+}
+button:hover{background:#2868dc}
+#result{display:none;text-align:center}
+.score{font-size:42px;font-weight:bold;margin:15px}
+.pass{color:#4ade80}.fail{color:#fb7185}
+.small{color:#9eabc4;font-size:14px}
+.timer{
+  position:sticky;top:10px;z-index:5;text-align:center;
+  background:#0c1423;border:1px solid #263554;border-radius:10px;
+  padding:12px;margin-bottom:15px;font-weight:bold
+}
+.progress{height:8px;background:#263554;border-radius:20px;overflow:hidden;margin:15px 0 25px}
+.bar{height:100%;width:0;background:#3478f6;transition:.2s}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="card">
+<h1>PRUEBA DE STAFF</h1>
+<div class="subtitle">Servidor de Roleplay • Evaluación de conocimientos y criterio</div>
+
+<label style="background:transparent;border:0;padding:0">
+Nombre del postulante
+<input id="name" type="text" placeholder="Escribe tu nombre">
+</label>
+
+<div class="timer">⏱️ Tiempo restante: <span id="time">20:00</span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+
+<form id="quiz" class="card">
+
+<script>
+const questions = [
+["1. ¿Qué significa RDM?",["Atropellar a alguien","Matar sin una razón válida de RP","Robar un vehículo","Salir del servidor"],1],
+["2. ¿Qué significa VDM?",["Usar un vehículo para matar/atropellar sin rol válido","Robar dinero","Usar un arma","Hacer MetaGaming"],0],
+["3. ¿Qué es MetaGaming?",["Usar información obtenida fuera del juego para beneficio dentro del RP","Correr rápido","Usar un vehículo","Hablar por radio"],0],
+["4. ¿Qué es PowerGaming?",["Forzar acciones irreales o situaciones sin dar oportunidad de reacción","Comprar una casa","Usar Discord","Cambiar de ropa"],0],
+["5. ¿Qué significa IC?",["In Character","Internet Chat","In Command","Illegal Character"],0],
+["6. ¿Qué significa OOC?",["Out Of Character","Only Online Character","Official RP Command","Open Organization Chat"],0],
+["7. Si un jugador te insulta durante un reporte, ¿qué debes hacer?",["Insultarlo también","Mantener la calma y continuar el procedimiento","Expulsarlo inmediatamente siempre","Ignorarlo y cerrar el reporte"],1],
+["8. Si tu amigo rompe una regla, ¿qué debes hacer?",["Dejarlo pasar","Sancionarlo según las reglas, siendo imparcial","Darle dinero","Avisarle para que escape"],1],
+["9. Si acusan a alguien de usar hacks pero no tienes pruebas claras, ¿qué haces?",["Lo baneas inmediatamente","Investigas y buscas pruebas antes de sancionar","Lo insultas","Cierras todos los reportes"],1],
+["10. ¿Puede un Staff usar sus comandos para beneficio propio?",["Sí","Solo si nadie mira","No","Sí, si es amigo del dueño"],2],
+["11. Un jugador pide armas usando tu rango de Staff. ¿Qué haces?",["Se las das","Le das algunas","Rechazas la petición y respetas las normas","Le das dinero"],2],
+["12. Si ves a otro Staff abusando de sus permisos, ¿qué haces?",["Lo ayudas","Lo ignoras","Reportas la situación siguiendo el procedimiento interno","Le das más permisos"],2],
+["13. ¿Cómo debe tratar un Staff a los jugadores?",["Con respeto y profesionalismo","Con insultos","De forma diferente según sean amigos","Con amenazas"],0],
+["14. Un jugador sale del servidor durante una situación de RP. ¿Qué debes revisar?",["Pruebas, contexto y reglas aplicables","Solo su nombre","Nada","Si es tu amigo"],0],
+["15. ¿Qué significa ser imparcial como Staff?",["Aplicar las reglas sin favoritismos","Ayudar a tus amigos","Sancionar solo a jugadores nuevos","No atender reportes"],0]
+];
+
+let html="";
+questions.forEach((q,i)=>{
+ html+=`<div class="question"><h3>${q[0]}</h3>`;
+ q[1].forEach((a,j)=>{
+   html+=`<label><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"> ${a}</label>`;
+ });
+ html+="</div>";
+});
+document.write(html);
+</script>
+
+<br>
+<button type="button" onclick="finish()">ENTREGAR PRUEBA</button>
+</form>
+
+<div id="result" class="card">
+<h1>RESULTADO</h1>
+<div id="message"></div>
+<div class="score" id="score"></div>
+<p id="detail"></p>
+<button onclick="location.reload()">VOLVER A INTENTAR</button>
+</div>
+
+</div>
+
+<script>
+let totalSeconds=1200;
+const timer=setInterval(()=>{
+ totalSeconds--;
+ let m=Math.floor(totalSeconds/60),s=totalSeconds%60;
+ document.getElementById("time").textContent=
+   String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+ if(totalSeconds<=0){
+   clearInterval(timer);
+   finish(true);
+ }
+},1000);
+
+function updateProgress(){
+ let answered=0;
+ questions.forEach((_,i)=>{
+   if(document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+ });
+ document.getElementById("bar").style.width=(answered/questions.length*100)+"%";
+}
+
+function finish(timeUp=false){
+ clearInterval(timer);
+ let correct=0, answered=0;
+ questions.forEach((q,i)=>{
+   const selected=document.querySelector(`input[name="q${i}"]:checked`);
+   if(selected){
+     answered++;
+     if(Number(selected.value)===q[2]) correct++;
+   }
+ });
+ const percentage=Math.round(correct/questions.length*100);
+ const passed=percentage>=80;
+ document.getElementById("quiz").style.display="none";
+ document.getElementById("result").style.display="block";
+
+ document.getElementById("score").textContent=percentage+"%";
+ document.getElementById("score").className="score "+(passed?"pass":"fail");
+ document.getElementById("message").innerHTML=
+   passed ? "<h2 class='pass'>✅ APROBADO</h2>" : "<h2 class='fail'>❌ NO APROBADO</h2>";
+ document.getElementById("detail").innerHTML=
+   `<b>${correct}</b> de ${questions.length} respuestas correctas.<br>
+   Respuestas contestadas: ${answered}/${questions.length}.`+
+   (timeUp?"<br><br>⏰ El tiempo se agotó.":"");
+}
+</script>
+</body>
+</html>
